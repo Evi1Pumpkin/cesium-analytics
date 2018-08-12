@@ -1,0 +1,26 @@
+{
+  "name": "cesium-analytics-client",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+"types": "index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Evi1Pumpkin/cesium-analytics.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Evi1Pumpkin/cesium-analytics/issues"
+  },
+  "homepage": "https://github.com/Evi1Pumpkin/cesium-analytics#readme",
+  "devDependencies": {
+    "@types/cesium": "^1.47.1",
+    "tsc": "^1.20150623.0",
+    "typescript": "^3.0.1"
+  },
+  "dependencies": {}
+}
