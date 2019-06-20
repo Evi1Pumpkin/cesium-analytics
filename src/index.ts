@@ -1,4 +1,4 @@
-import { Viewer, PrimitiveCollection, Primitive } from "cesium";
+import { Viewer, PrimitiveCollection } from 'cesium';
 
 export default class CesiumAnalyticsClient {
   private cesiumViewer: any;
@@ -6,14 +6,13 @@ export default class CesiumAnalyticsClient {
   constructor(cesiumViewer: Viewer) {
     this.cesiumViewer = cesiumViewer;
 
-    console.log("CesiumAnalyticsClient says hello");
+    console.log('CesiumAnalyticsClient says hello');
     this.intervalRequest();
   }
 
   private intervalRequest() {
     setInterval(() => {
       const primitives = this.cesiumViewer.scene.primitives._primitives;
-
       const primitivesTree = this.getPrimitivesEntitiesRecursively(primitives);
 
       console.log(primitivesTree);
@@ -29,6 +28,16 @@ export default class CesiumAnalyticsClient {
   //   .map(item => console.log(item))
   // });
 
+  // primitiveCollection
+  //    .filter( x => x.length > 1)
+  //    .forEach(x => {
+  //      x._primitives
+  //      .filter(x => x.length > 1)
+  //      .map(x => x._primitives.forEach(primitive => {
+  // 		console.log(primitive._instanceIds)
+  //      }))
+  //   });
+
   // Entities:
   // this.mapsManagerService.getMap().getCesiumViewer().dataSources._dataSources
   // .filter( x => x._entityCollection._entities.length > 0)
@@ -39,39 +48,39 @@ export default class CesiumAnalyticsClient {
 
   private getPrimitivesEntitiesRecursively(
     primitiveCollection: PrimitiveCollection,
-    resultTree: any = {}
+    resultTree: any = {},
+    lastNameCounter: number = 1
   ) {
     if (Array.isArray(primitiveCollection)) {
-      let nameCounter = 1;
+      let nameCounter = lastNameCounter + 1;
 
       primitiveCollection.forEach(node => {
         const nodeName = node.constructor.name;
         let resultName = nodeName;
-        
+        const resultNode: any = {}; // TODO: create typing
 
         // check if value name already exist
         if (resultTree.hasOwnProperty(nodeName)) {
           resultName = nodeName + nameCounter;
-          nameCounter++;
+        }
+        nameCounter++;
+
+        if (!node.hasOwnProperty('_primitives')) {
+          const isPrimitive = meaningfulFields.some(field =>
+            node.hasOwnProperty(field) && this.isPrimitiveFieldNotEmpty(node[field])
+          );
+
+          if (isPrimitive) {
+            Object.assign(resultNode, ...this.handlePrimitive(node));
+            resultTree[resultName] = resultNode;
+          }
         }
 
-        const resultNode: any = { type: nodeName }; // TODO: create typing
-
-        // handle BillboardCollection
-        // handle PointPrimitiveCollection
-        // handle PolylineCollection
-        // handle LabelCollection
-
-        if (nodeName === 'Primitive') {
-          Object.assign(resultNode, ...this.handlePrimitive(node));
-        }
-
-        resultTree[resultName] = resultNode;
-
-        if (node.hasOwnProperty('_primitives')) {
+        if (node.hasOwnProperty('_primitives') && node._primitives.length > 0) {
           this.getPrimitivesEntitiesRecursively(
             node._primitives,
-            resultTree[resultName]
+            resultTree,
+            nameCounter
           );
         }
       });
@@ -80,24 +89,42 @@ export default class CesiumAnalyticsClient {
     }
   }
 
-  private handlePrimitive(primitive: Primitive) {
+  private handlePrimitive(primitive: any) {
     const resultPrimitive: any = {}; // TODO: add typing
 
-    if (primitive.hasOwnProperty("appearance")) {
-      resultPrimitive["appearance"] = primitive.appearance; // TODO: check if we get the key
-    }
-
-    if (primitive.hasOwnProperty("geometryInstances")) {
-      resultPrimitive["geometryInstances"] = primitive.geometryInstances; // TODO: check if we get the key
-    }
-
-    if (primitive.hasOwnProperty("_instanceIds")) {
-      resultPrimitive["_instanceIds"] = (primitive as any)._instanceIds;
-    }
-
-
-    // get Instances
+    meaningfulFields.forEach(field => {
+      if (primitive.hasOwnProperty(field) && this.isPrimitiveFieldNotEmpty(primitive[field])) {
+        resultPrimitive[field] = primitive[field];
+      }
+    });
 
     return resultPrimitive;
   }
+
+  private isPrimitiveFieldNotEmpty(PrimitiveField: any) : boolean {
+    let result: boolean = false;
+
+    if (Array.isArray(PrimitiveField)) {
+      result = PrimitiveField.length > 0 ? true : false;
+    } else if (!Object.is(PrimitiveField, {})) {
+      result = true;
+    } else if (PrimitiveField) {
+      result = true;
+    }
+
+    return result;
+  }
 }
+
+const meaningfulFields: string[] = [
+  '_billboards',
+  '_polylines',
+  '_pointPrimitives',
+  // '_billboardCollection',
+  '_labels',
+  // '_labelsCollection',
+  '_instanceIds'
+];
+
+// Get imagery maps:
+// cesiumViewer.imageryLayers._layers.filter(Boolean).forEach(layer => console.log(layer))
