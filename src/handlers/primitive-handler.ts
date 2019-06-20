@@ -42,45 +42,33 @@ export default class PrimitiveHandler {
 
   public getPrimitivesEntitiesRecursively(
     primitiveCollection: PrimitiveCollection,
-    resultTree: any = {},
-    lastNameCounter: number = 1
+    resultArr: any[] = [],
   ) {
     if (Array.isArray(primitiveCollection)) {
-      let nameCounter = lastNameCounter + 1;
-
       primitiveCollection.forEach(node => {
-        const nodeName = node.constructor.name;
-        let resultName = nodeName;
-        const resultNode: any = {}; // TODO: create typing
-
-        // check if value name already exist
-        if (resultTree.hasOwnProperty(nodeName)) {
-          resultName = nodeName + nameCounter;
-        }
-        nameCounter++;
-
         if (!node.hasOwnProperty('_primitives')) {
           const isPrimitive = this.meaningfulFields.some(field =>
             node.hasOwnProperty(field) && this.isPrimitiveFieldNotEmpty(node[field])
           );
 
           if (isPrimitive) {
+            const resultNode: any = {primitiveName: node.constructor.name}; 
+
             Object.assign(resultNode, ...this.handlePrimitive(node));
-            resultTree[resultName] = resultNode;
+            resultArr.push(resultNode);
           }
         }
 
         if (node.hasOwnProperty('_primitives') && node._primitives.length > 0) {
           this.getPrimitivesEntitiesRecursively(
             node._primitives,
-            resultTree,
-            nameCounter
+            resultArr
           );
         }
       });
-
-      return resultTree;
     }
+
+    return resultArr;
   }
 
   private handlePrimitive(primitive: any) {
