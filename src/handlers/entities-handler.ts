@@ -1,6 +1,6 @@
 import { PrimitiveCollection, Viewer } from 'cesium';
 
-export class PrimitiveHandler {
+export class EntitiesHandler {
   private readonly meaningfulFields: string[] = [
     '_billboards',
     '_polylines',
@@ -45,7 +45,7 @@ export class PrimitiveHandler {
 
   public getEntities() {
     return (this.cesiumViewer.dataSources as any)
-    ._dataSources.filter( (x: any) => x._entityCollection._entities.length > 0)
+    ._dataSources.filter((x: any) => x._entityCollection._entities.length > 0)
   }
 
   public getPrimitives() {
@@ -70,7 +70,7 @@ export class PrimitiveHandler {
           if (isPrimitive) {
             const resultNode: any = { primitiveName: node.constructor.name };
 
-            Object.assign(resultNode, ...this.handlePrimitive(node));
+            Object.assign(resultNode, this.handlePrimitive(node));
             resultArr.push(resultNode);
           }
         }
