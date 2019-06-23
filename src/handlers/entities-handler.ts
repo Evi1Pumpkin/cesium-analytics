@@ -1,6 +1,6 @@
-import { PrimitiveCollection } from 'cesium';
+import { PrimitiveCollection, Viewer } from 'cesium';
 
-export class PrimitiveHandler {
+export class EntitiesHandler {
   private readonly meaningfulFields: string[] = [
     '_billboards',
     '_polylines',
@@ -9,9 +9,12 @@ export class PrimitiveHandler {
     '_labels',
     // '_labelsCollection',
     '_instanceIds'
-];
+  ];
+  private readonly cesiumViewer: Viewer;
 
-  constructor() {}
+  constructor(viewer: Viewer) {
+    this.cesiumViewer = viewer;
+  }
 
   // Primitives:
   // this.mapsManagerService.getMap().getCesiumViewer().scene._primitives._primitives
@@ -40,30 +43,40 @@ export class PrimitiveHandler {
   // get primitive -> appearance + all instances + type + is connected to an entity?
   // entities + dataSource -> create primitives, or it can be created differently
 
-  public getPrimitivesEntitiesRecursively(
+  public getEntities() {
+    return (this.cesiumViewer.dataSources as any)
+    ._dataSources.filter((x: any) => x._entityCollection._entities.length > 0)
+  }
+
+  public getPrimitives() {
+    return this.getPrimitivesRecursively(
+      (this.cesiumViewer.scene.primitives as any)._primitives
+    );
+  }
+
+  private getPrimitivesRecursively(
     primitiveCollection: PrimitiveCollection,
-    resultArr: any[] = [],
+    resultArr: any[] = []
   ) {
     if (Array.isArray(primitiveCollection)) {
       primitiveCollection.forEach(node => {
         if (!node.hasOwnProperty('_primitives')) {
-          const isPrimitive = this.meaningfulFields.some(field =>
-            node.hasOwnProperty(field) && this.isPrimitiveFieldNotEmpty(node[field])
+          const isPrimitive = this.meaningfulFields.some(
+            field =>
+              node.hasOwnProperty(field) &&
+              this.isPrimitiveFieldNotEmpty(node[field])
           );
 
           if (isPrimitive) {
-            const resultNode: any = {primitiveName: node.constructor.name}; 
+            const resultNode: any = { primitiveName: node.constructor.name };
 
-            Object.assign(resultNode, ...this.handlePrimitive(node));
+            Object.assign(resultNode, this.handlePrimitive(node));
             resultArr.push(resultNode);
           }
         }
 
         if (node.hasOwnProperty('_primitives') && node._primitives.length > 0) {
-          this.getPrimitivesEntitiesRecursively(
-            node._primitives,
-            resultArr
-          );
+          this.getPrimitivesRecursively(node._primitives, resultArr);
         }
       });
     }
@@ -75,7 +88,10 @@ export class PrimitiveHandler {
     const resultPrimitive: any = {}; // TODO: add typing
 
     this.meaningfulFields.forEach(field => {
-      if (primitive.hasOwnProperty(field) && this.isPrimitiveFieldNotEmpty(primitive[field])) {
+      if (
+        primitive.hasOwnProperty(field) &&
+        this.isPrimitiveFieldNotEmpty(primitive[field])
+      ) {
         resultPrimitive[field] = primitive[field];
       }
     });
@@ -83,7 +99,7 @@ export class PrimitiveHandler {
     return resultPrimitive;
   }
 
-  private isPrimitiveFieldNotEmpty(PrimitiveField: any) : boolean {
+  private isPrimitiveFieldNotEmpty(PrimitiveField: any): boolean {
     let result: boolean = false;
 
     if (Array.isArray(PrimitiveField)) {

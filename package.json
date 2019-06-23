@@ -25,5 +25,7 @@
   "peerDependencies": {
     "cesium": "^1.58.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cesium": "^1.58.1"
+  }
 }

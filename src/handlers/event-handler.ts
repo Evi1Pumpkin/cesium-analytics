@@ -1,4 +1,4 @@
-const Cesium = require('cesium/Cesium');
+const Cesium = require('cesium/Source/Cesium');
 
 export class EventHandler {
     private screenSpaceEventHandler: Cesium.ScreenSpaceEventHandler;
