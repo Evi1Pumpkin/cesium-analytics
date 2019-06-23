@@ -1,15 +1,16 @@
+import { EntitiesHandler } from './handlers/entities-handler';
 import { EventHandler } from './handlers/event-handler';
-import PrimitiveHandler from './handlers/entities-handler';
 import { Viewer } from 'cesium';
 
 export default class CesiumAnalyticsClient {
-  private entitiesHandler: PrimitiveHandler;
+  // private cesiumViewer: any;
+  private entitiesHandler: EntitiesHandler;
   private eventHandler: EventHandler;
 
   constructor(cesiumViewer: Viewer) {
-    this.entitiesHandler = new PrimitiveHandler(cesiumViewer);
+    // this.cesiumViewer = cesiumViewer;
+    this.entitiesHandler = new EntitiesHandler(cesiumViewer);
     this.eventHandler = new EventHandler(cesiumViewer);
-    this.eventHandler.getHello();
 
     console.log('CesiumAnalyticsClient says hello');
     this.intervalRequest();
@@ -17,11 +18,15 @@ export default class CesiumAnalyticsClient {
 
   private intervalRequest() {
     setInterval(() => {
-      const primitives = {'Primitives': this.entitiesHandler.getPrimitives()};
-      const entities = {'Entities': this.entitiesHandler.getEntities()};
+      const primitives = this.entitiesHandler.getPrimitives();
+      const entities = this.entitiesHandler.getEntities();
 
-      console.log(primitives);
-      console.log(entities);
+      console.log('Primitives', primitives);
+      console.log('Entities', entities);
+
+      const events = this.eventHandler.getEvents();
+      console.log('Events', events);
+      this.eventHandler.clearEvents();
     }, 10000);
   }
 

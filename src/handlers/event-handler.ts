@@ -1,33 +1,27 @@
-import { ScreenSpaceEventHandler, Viewer } from "cesium";
-const Cesium = require('cesium/Source/Cesium');
+const Cesium = require('cesium/Cesium');
 
 export class EventHandler {
-    private viewer: Viewer;
-    private handler: ScreenSpaceEventHandler;
+    private screenSpaceEventHandler: Cesium.ScreenSpaceEventHandler;
+    private eventsArray: {eventType: Cesium.ScreenSpaceEventType, value: any}[] = [];
 
-    constructor(viewer: Viewer) {
-        this.viewer = viewer;
-        this.handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
-        this.registerEvents();
-    }
-
-    private registerEvents() {
-        this.handler.setInputAction(({position}) => {
-            // var mousePosition = new Cesium.Cartesian2(e.clientX, e.clientY);
-            const ellipsoid = this.viewer.scene.globe.ellipsoid;
-            const cartesian = this.viewer.camera.pickEllipsoid(position, ellipsoid);
+    constructor(viewer: Cesium.Viewer) {
+        this.screenSpaceEventHandler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+        this.screenSpaceEventHandler.setInputAction(({position}: any) => {
+            const ellipsoid = viewer.scene.globe.ellipsoid;
+            const cartesian = viewer.camera.pickEllipsoid(position, ellipsoid);
             if (cartesian) {
-                const cartographic = ellipsoid.cartesianToCartographic(cartesian);
-                const longitudeString = Cesium.Math.toDegrees(cartographic.longitude);
-                const latitudeString = Cesium.Math.toDegrees(cartographic.latitude);
-                console.log(longitudeString, latitudeString);
+                this.eventsArray.push({eventType: Cesium.ScreenSpaceEventType.LEFT_CLICK, value: cartesian})
             } else {
-                console.log('NOT IN GLOBE');
+                console.log('Globe was not picked');
             }
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
 
-    public getHello() {
-        return 'Hello';
+    public getEvents() {
+        return this.eventsArray;
+    }
+
+    public clearEvents() {
+        this.eventsArray = [];
     }
 }
