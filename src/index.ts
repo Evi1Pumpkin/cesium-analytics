@@ -19,10 +19,10 @@ export class CesiumAnalyticsClient {
   private intervalRequest() {
     setInterval(() => {
       const primitives = this.cesiumViewer.scene.primitives._primitives;
-      const primitivesTree = this.primitiveHandler.getPrimitivesEntitiesRecursively(primitives);
+      const primitivesArray = this.primitiveHandler.getPrimitivesEntitiesRecursively(primitives);
 
       console.log("primitives: ");
-      console.log(primitivesTree);
+      console.log(primitivesArray);
 
       const events = this.eventHandler.getEvents();
       console.log('Events', events);
