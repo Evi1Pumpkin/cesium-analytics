@@ -1,6 +1,6 @@
 import { PrimitiveCollection } from 'cesium';
 
-export default class PrimitiveHandler {
+export class PrimitiveHandler {
   private readonly meaningfulFields: string[] = [
     '_billboards',
     '_polylines',

@@ -1,13 +1,16 @@
-import PrimitiveHandler from './handlers/primitive-handler';
+import { PrimitiveHandler } from './handlers/primitive-handler';
+import { EventHandler } from './handlers/event-handler';
 import { Viewer } from 'cesium';
 
-export default class CesiumAnalyticsClient {
+export class CesiumAnalyticsClient {
   private cesiumViewer: any;
   private primitiveHandler: PrimitiveHandler;
+  private eventHandler: EventHandler;
 
   constructor(cesiumViewer: Viewer) {
     this.cesiumViewer = cesiumViewer;
     this.primitiveHandler = new PrimitiveHandler();
+    this.eventHandler = new EventHandler(cesiumViewer);
 
     console.log('CesiumAnalyticsClient says hello');
     this.intervalRequest();
@@ -20,6 +23,10 @@ export default class CesiumAnalyticsClient {
 
       console.log("primitives: ");
       console.log(primitivesTree);
+
+      const events = this.eventHandler.getEvents();
+      console.log('Events', events);
+      this.eventHandler.clearEvents();
     }, 10000);
   }
 
