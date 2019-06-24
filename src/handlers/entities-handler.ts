@@ -43,9 +43,11 @@ export class EntitiesHandler {
   // get primitive -> appearance + all instances + type + is connected to an entity?
   // entities + dataSource -> create primitives, or it can be created differently
 
-  public getEntities() {
-    return (this.cesiumViewer.dataSources as any)
+  public getEntities() : Array<any> {
+    const dataSourcesEntities: Array<any> = (this.cesiumViewer.dataSources as any)
     ._dataSources.filter((x: any) => x._entityCollection._entities.length > 0)
+    
+    return ([...dataSourcesEntities, ...(this.cesiumViewer.entities as any)._entities._array]);
   }
 
   public getPrimitives() {
