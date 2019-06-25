@@ -1,9 +1,9 @@
 import { EntitiesHandler } from './handlers/entities-handler';
 import { EventHandler } from './handlers/event-handler';
 import { Viewer } from 'cesium';
-
 export default class CesiumAnalyticsClient {
   // private cesiumViewer: any;
+
   private entitiesHandler: EntitiesHandler;
   private eventHandler: EventHandler;
 
