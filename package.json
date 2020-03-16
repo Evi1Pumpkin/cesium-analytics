@@ -7,6 +7,14 @@
   "scripts": {
     "build": "tsc"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": "prettier --write"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Evi1Pumpkin/cesium-analytics.git"
@@ -20,6 +28,9 @@
   "devDependencies": {
     "@types/cesium": "^1.66.7",
     "@types/node": "^13.9.1",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
+    "prettier": "^1.19.1",
     "typescript": "^3.8.3"
   },
   "peerDependencies": {
