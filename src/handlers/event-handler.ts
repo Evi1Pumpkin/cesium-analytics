@@ -1,12 +1,12 @@
-import { ScreenSpaceEventHandler, ScreenSpaceEventType, Viewer } from 'cesium';
+import { ScreenSpaceEventHandler, ScreenSpaceEventType, Viewer, Cartesian3 } from 'cesium';
 
 export class EventHandler {
     private screenSpaceEventHandler: ScreenSpaceEventHandler;
-    private eventsArray: {eventType: ScreenSpaceEventType, value: any}[] = [];
+    private eventsArray: {eventType: ScreenSpaceEventType, value: Cartesian3}[] = [];
 
     constructor(viewer: Viewer) {
         this.screenSpaceEventHandler = new ScreenSpaceEventHandler(viewer.canvas);
-        this.screenSpaceEventHandler.setInputAction(({position}: any) => {
+        this.screenSpaceEventHandler.setInputAction(({position}) => {
             const ellipsoid = viewer.scene.globe.ellipsoid;
             const cartesian = viewer.camera.pickEllipsoid(position, ellipsoid);
             if (cartesian) {
@@ -17,11 +17,9 @@ export class EventHandler {
         }, ScreenSpaceEventType.LEFT_CLICK);
     }
 
-    public getEvents() {
-        return this.eventsArray;
-    }
-
-    public clearEvents() {
+    public dumpEvents() {
+        const events = this.eventsArray;
         this.eventsArray = [];
+        return events;
     }
 }
