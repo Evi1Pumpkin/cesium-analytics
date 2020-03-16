@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Evi1Pumpkin/cesium-analytics#readme",
   "devDependencies": {
+    "@types/cesium": "^1.66.7",
     "@types/node": "^13.9.1",
     "typescript": "^3.8.3"
   },
