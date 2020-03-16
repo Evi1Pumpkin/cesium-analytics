@@ -9,7 +9,10 @@ export class ImageryLayersHandler {
 
     getImageryLayers(): string[] {
         return (this.viewer.imageryLayers as any)._layers.map((layer: any) => {
-            return layer._imageryProvider?.url || layer._imageryProvider?._imageryProvider?.url
+            return (
+                layer._imageryProvider?.url ||
+                layer._imageryProvider?._imageryProvider?.url
+            );
         });
     }
 }

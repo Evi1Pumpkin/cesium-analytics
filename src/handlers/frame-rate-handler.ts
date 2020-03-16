@@ -1,4 +1,4 @@
-import { Viewer, FrameRateMonitor } from "cesium";
+import { Viewer, FrameRateMonitor } from 'cesium';
 
 export class FrameRateHandler {
     private frameRateMonitor: FrameRateMonitor;
