@@ -4,9 +4,11 @@ import { ImageryLayersHandler } from './handlers/imagery-layers-handler';
 import { FrameRateHandler } from './handlers/frame-rate-handler';
 import { CameraHandler } from './handlers/camera-handler';
 import { Analytics } from './models/analytics.model';
+import { AnalyticsOptions } from './models/analytics-options.model';
 import { Viewer } from 'cesium';
 
 export class CesiumAnalyticsClient {
+    private interval: NodeJS.Timeout;
     private entitiesHandler: EntitiesHandler;
     private eventHandler: EventHandler;
     private imageryLayersHandler: ImageryLayersHandler;
@@ -19,12 +21,21 @@ export class CesiumAnalyticsClient {
         this.imageryLayersHandler = new ImageryLayersHandler(cesiumViewer);
         this.frameRateHandler = new FrameRateHandler(cesiumViewer);
         this.cameraHandler = new CameraHandler(cesiumViewer.camera);
-
-        console.log('CesiumAnalyticsClient says hello');
-        this.intervalRequest();
     }
 
-    getAnalytics(): Analytics {
+    start(options: AnalyticsOptions, cb: (analytics: Analytics) => void) {
+        const interval = options.interval || 60000;
+
+        this.interval = setInterval(() => {
+            cb(this.getAnalytics());
+        }, interval);
+    }
+
+    stop() {
+        clearInterval(this.interval);
+    }
+
+    private getAnalytics(): Analytics {
         return {
             primitives: this.entitiesHandler.getPrimitives(),
             entities: this.entitiesHandler.getEntities(),
@@ -35,11 +46,5 @@ export class CesiumAnalyticsClient {
                 position: this.cameraHandler.getCameraPosition()
             }
         };
-    }
-
-    private intervalRequest() {
-        setInterval(() => {
-            console.log(this.getAnalytics());
-        }, 10000);
     }
 }
